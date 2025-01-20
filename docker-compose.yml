@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/var/www/html
+        environment:
+            - APP_ENV=local
+            - APP_DEBUG=true
+            - DB_CONNECTION=pgsql
+            - DB_HOST=db
+            - DB_PORT=5432
+            - DB_DATABASE=test_btx
+            - DB_USERNAME=dzyuba
+            - DB_PASSWORD=1111
+        command: php artisan serve --host=0.0.0.0 --port=8000
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: dzyuba
+            POSTGRES_PASSWORD: 1111
+            POSTGRES_DB: test_btx
+        ports:
+            - "5432:5432"
+
+    queue:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: php artisan queue:work
+        depends_on:
+            - app
